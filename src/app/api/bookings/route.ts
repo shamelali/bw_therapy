@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { bookings, providers, services, users } from "@/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, bookings, desc, eq, providers, services, users } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
 import { getProviderByUserId } from "@/lib/data";
 import { addMinutesToTime } from "@/lib/utils";
@@ -97,7 +96,7 @@ export async function POST(req: NextRequest) {
         eq(bookings.startTime, parsed.data.startTime),
       ),
     );
-  const activeConflict = conflicting.find((b) => b.status !== "cancelled" && b.status !== "declined");
+  const activeConflict = conflicting.find((b: any) => b.status !== "cancelled" && b.status !== "declined");
   if (activeConflict) {
     return NextResponse.json({ error: "This time slot was just booked. Please choose another." }, { status: 409 });
   }

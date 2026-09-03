@@ -1,8 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { asc } from "drizzle-orm";
+import { asc, users } from "@/lib/db-compat";
 import { AdminUsersManager } from "@/components/dashboard/admin-users-manager";
 import { isLocale, localizedPath, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";

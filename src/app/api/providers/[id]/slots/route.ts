@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { availability, bookings, services } from "@/db/schema";
-import { and, eq, ne, notInArray } from "drizzle-orm";
+import { and, availability, bookings, eq, ne, notInArray, services } from "@/lib/db-compat";
 import { addMinutesToTime, timeToMinutes } from "@/lib/utils";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -55,7 +54,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     while (cursor + service.durationMinutes <= windowEnd) {
       const startTime = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
       const endTime = addMinutesToTime(startTime, service.durationMinutes);
-      const overlaps = existingBookings.some((b) => {
+      const overlaps = existingBookings.some((b: any) => {
         return startTime < b.endTime && b.startTime < endTime;
       });
       const isPast = isToday && cursor <= nowMinutes;

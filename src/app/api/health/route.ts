@@ -1,13 +1,18 @@
-import { db } from "@/db";
+import { db, isDemoMode } from "@/db";
 import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (isDemoMode()) {
+    // Demo mode uses the in-memory store — no external DB to reach.
+    return Response.json({ ok: true, mode: "demo" });
+  }
   try {
     await db.execute(sql`select 1`);
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, mode: "postgres" });
   } catch {
     return Response.json({ ok: false }, { status: 500 });
   }
 }
+

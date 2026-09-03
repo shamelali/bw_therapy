@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getProviderByUserId } from "@/lib/data";
 import { db } from "@/db";
-import { bookings, providers, services, users } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { bookings, desc, eq, providers, services, users } from "@/lib/db-compat";
 import { Card, EmptyState, Badge } from "@/components/ui/primitives";
 import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import { CalendarCheck, Clock, DollarSign, Users as UsersIcon, Building2, ListChecks, ArrowRight } from "lucide-react";
@@ -121,7 +120,7 @@ export default async function DashboardOverviewPage({ params }: { params: Promis
                       {b.serviceName} · {formatDate(b.date)} at {formatTime(b.startTime)}
                     </p>
                   </div>
-                  <Badge variant={statusVariant(b.status)}>{dict.bookingStatus[b.status]}</Badge>
+                  <Badge variant={statusVariant(b.status)}>{dict.bookingStatus[b.status as keyof typeof dict.bookingStatus]}</Badge>
                 </div>
               ))}
             </div>
@@ -271,7 +270,7 @@ export default async function DashboardOverviewPage({ params }: { params: Promis
                     {b.serviceName} · {formatDate(b.date)} at {formatTime(b.startTime)}
                   </p>
                 </div>
-                <Badge variant={statusVariant(b.status)}>{dict.bookingStatus[b.status]}</Badge>
+                <Badge variant={statusVariant(b.status)}>{dict.bookingStatus[b.status as keyof typeof dict.bookingStatus]}</Badge>
               </div>
             ))}
           </div>

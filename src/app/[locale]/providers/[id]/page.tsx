@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { availability, providers, reviews, services, users } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { availability, desc, eq, providers, reviews, services, users } from "@/lib/db-compat";
 import { PublicNavbar } from "@/components/layout/public-navbar";
 import { BookingWidget } from "@/components/marketplace/booking-widget";
 import { StaticStars } from "@/components/ui/star-rating";
@@ -68,7 +67,7 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <Badge className="bg-white/15 text-white">{dict.providerTypes[provider.type]}</Badge>
+              <Badge className="bg-white/15 text-white">{dict.providerTypes[provider.type as keyof typeof dict.providerTypes]}</Badge>
               <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{provider.businessName}</h1>
               <p className="mt-2 max-w-2xl text-teal-50">{provider.tagline}</p>
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-teal-50">

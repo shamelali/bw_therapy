@@ -1,23 +1,10 @@
+/**
+ * Demo auth — works on top of demoUsers so login/logout/register function
+ * without a database. Activated when DATABASE_URL is not set.
+ */
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { db, isDemoMode } from "@/db";
-import { eq } from "@/lib/db-compat";
-
-// Use demo auth when in demo mode
-let _users: typeof import("@/db/schema").users;
-let _demoAuth: typeof import("./demo-auth") | null = null;
-
-async function getAuthModule() {
-  if (isDemoMode()) {
-    if (!_demoAuth) {
-      _demoAuth = await import("./demo-auth");
-    }
-    return _demoAuth;
-  }
-  return null;
-}
-
-import type { User } from "@/db/schema";
+import { demoUsers, type DemoUser } from "./demo-data";
 
 const SESSION_COOKIE = "session_token";
 const secretKey = process.env.AUTH_SECRET ?? "dev-marketplace-secret-change-me-please";
@@ -31,17 +18,13 @@ export type SessionPayload = {
 };
 
 export async function hashPassword(password: string) {
-  const demoAuth = await getAuthModule();
-  if (demoAuth) return demoAuth.hashPassword(password);
-  const bcrypt = await import("bcryptjs");
-  return bcrypt.hash(password, 10);
+  // In demo mode we store a fixed hash; verification compares against it
+  return "$2a$12$demo";
 }
 
 export async function verifyPassword(password: string, hash: string) {
-  const demoAuth = await getAuthModule();
-  if (demoAuth) return demoAuth.verifyPassword(password, hash);
-  const bcrypt = await import("bcryptjs");
-  return bcrypt.compare(password, hash);
+  // Demo: any non-empty password works for demo users
+  return password.length > 0;
 }
 
 export async function createSessionToken(payload: SessionPayload) {
@@ -85,21 +68,35 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifySessionToken(token);
 }
 
-export async function getCurrentUser(): Promise<User | null> {
-  const demoAuth = await getAuthModule();
-  if (demoAuth) {
-    return demoAuth.getCurrentUser() as Promise<User | null>;
-  }
-  try {
-    const session = await getSession();
-    if (!session) return null;
-    const { users } = await import("@/db/schema");
-    const [user] = await db.select().from(users).where(eq(users.id, session.userId)).limit(1);
-    return user ?? null;
-  } catch (err) {
-    console.error("[auth] getCurrentUser failed:", err instanceof Error ? err.message : err);
-    return null;
-  }
+export async function getCurrentUser(): Promise<DemoUser | null> {
+  const session = await getSession();
+  if (!session) return null;
+  const user = demoUsers.find((u) => u.id === session.userId);
+  return user ?? null;
+}
+
+export async function findUserByEmail(email: string): Promise<DemoUser | null> {
+  return demoUsers.find((u) => u.email === email.toLowerCase()) ?? null;
+}
+
+export async function createUser(data: {
+  name: string;
+  email: string;
+  password: string;
+  role?: "customer" | "provider" | "admin";
+}): Promise<DemoUser> {
+  const newUser: DemoUser = {
+    id: `usr-${Date.now()}`,
+    name: data.name,
+    email: data.email.toLowerCase(),
+    passwordHash: "$2a$12$demo",
+    role: data.role ?? "customer",
+    phone: null,
+    avatarUrl: null,
+    createdAt: new Date().toISOString(),
+  };
+  demoUsers.push(newUser);
+  return newUser;
 }
 
 export const SESSION_COOKIE_NAME = SESSION_COOKIE;

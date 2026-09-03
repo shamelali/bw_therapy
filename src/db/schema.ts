@@ -144,6 +144,11 @@ export const bookingsRelations = relations(bookings, ({ one, many }) => ({
   review: many(reviews),
 }));
 
+// Demo mode: re-export demo column refs so pages can use the same imports
+// when DATABASE_URL is not set. The demo column refs work with the demo-db
+// query builder exported from @/db.
+export { users as demoUsers, providers as demoProviders, services as demoServices, bookings as demoBookings, reviews as demoReviews, availability as demoAvailability } from "@/lib/demo-db";
+
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   booking: one(bookings, { fields: [reviews.bookingId], references: [bookings.id] }),
   provider: one(providers, { fields: [reviews.providerId], references: [providers.id] }),

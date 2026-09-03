@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { providers, services, availability, reviews, users } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { availability, desc, eq, providers, reviews, services, users } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

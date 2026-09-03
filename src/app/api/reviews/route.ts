@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { bookings, providers, reviews } from "@/db/schema";
-import { avg, count, eq } from "drizzle-orm";
+import { avg, bookings, count, eq, providers, reviews } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
 
 const createSchema = z.object({

@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/db";
-import { providers } from "@/db/schema";
-import { and, asc, eq, ilike, or } from "drizzle-orm";
+import { db, isDemoMode } from "@/db";
+import { and, asc, eq, ilike, or } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
+
+// Use demo-aware table references
+async function getProviders() {
+  if (isDemoMode()) {
+    const demoDb = await import("@/lib/demo-db");
+    return demoDb.providers;
+  }
+  const schema = await import("@/db/schema");
+  return schema.providers;
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -11,6 +20,8 @@ export async function GET(req: NextRequest) {
   const city = searchParams.get("city")?.trim();
   const type = searchParams.get("type")?.trim();
   const includeInactive = searchParams.get("all") === "true";
+
+  const providers = await getProviders();
 
   const conditions = [] as any[];
   if (!includeInactive) conditions.push(eq(providers.isActive, true));
@@ -52,6 +63,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
+  const providers = await getProviders();
   const [row] = await db
     .insert(providers)
     .values({ ...parsed.data, userId: user.id, priceFrom: String(parsed.data.priceFrom ?? 0) })

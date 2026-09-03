@@ -42,9 +42,9 @@ export default function LoginPage() {
 
   function fillDemo(role: "customer" | "provider" | "admin") {
     const creds = {
-      customer: "amelia@example.com",
-      provider: "harmony.wellness@example.com",
-      admin: "admin@serenity.app",
+      customer: "john@demo.com",
+      provider: "sarah@demo.com",
+      admin: "admin@demo.com",
     };
     setEmail(creds[role]);
     setPassword("password123");

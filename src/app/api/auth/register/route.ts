@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { providers, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, providers, users } from "@/lib/db-compat";
 import { hashPassword, setSessionCookie } from "@/lib/auth";
 
 const schema = z.object({

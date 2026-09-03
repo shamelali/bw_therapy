@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { availability } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { availability, eq } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
 import { getProviderByUserId } from "@/lib/data";
 

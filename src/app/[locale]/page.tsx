@@ -1,6 +1,5 @@
 import { db } from "@/db";
-import { providers } from "@/db/schema";
-import { and, asc, eq, ilike, or } from "drizzle-orm";
+import { and, asc, eq, ilike, or, providers } from "@/lib/db-compat";
 import { PublicNavbar } from "@/components/layout/public-navbar";
 import { SearchFilters } from "@/components/marketplace/search-filters";
 import { ProviderCard } from "@/components/marketplace/provider-card";

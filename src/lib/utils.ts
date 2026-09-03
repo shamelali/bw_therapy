@@ -13,8 +13,19 @@ export function formatCurrency(value: string | number) {
   }).format(Number.isFinite(num) ? num : 0);
 }
 
+function parseDateInput(date: string | Date): Date {
+  if (date instanceof Date) return date;
+  if (typeof date === "string") {
+    // Bare calendar dates are interpreted in local time; full ISO timestamps parse as-is.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return new Date(`${date}T00:00:00`);
+    const parsed = new Date(date);
+    return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
+  }
+  return new Date(0);
+}
+
 export function formatDate(date: string | Date) {
-  const d = typeof date === "string" ? new Date(`${date}T00:00:00`) : date;
+  const d = parseDateInput(date);
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
@@ -24,7 +35,7 @@ export function formatDate(date: string | Date) {
 }
 
 export function formatShortDate(date: string | Date) {
-  const d = typeof date === "string" ? new Date(`${date}T00:00:00`) : date;
+  const d = parseDateInput(date);
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",

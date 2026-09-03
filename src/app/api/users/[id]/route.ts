@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, users } from "@/lib/db-compat";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
