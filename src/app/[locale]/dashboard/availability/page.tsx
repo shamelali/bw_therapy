@@ -35,7 +35,12 @@ export default async function AvailabilityPage({ params }: { params: Promise<{ l
     );
   }
 
-  const rows = await db.select().from(availability).where(eq(availability.providerId, provider.id));
+  let rows: any[] = [];
+  try {
+    rows = await db.select().from(availability).where(eq(availability.providerId, provider.id));
+  } catch (err) {
+    console.error("[availability] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   return (
     <div>

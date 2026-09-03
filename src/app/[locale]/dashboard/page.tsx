@@ -64,18 +64,25 @@ export default async function DashboardOverviewPage({ params }: { params: Promis
   };
 
   if (user.role === "admin") {
-    const [allBookings, allProviders, allUsers] = await Promise.all([
-      db
-        .select(baseSelect)
-        .from(bookings)
-        .innerJoin(providers, eq(providers.id, bookings.providerId))
-        .innerJoin(services, eq(services.id, bookings.serviceId))
-        .innerJoin(users, eq(users.id, bookings.customerId))
-        .orderBy(desc(bookings.createdAt))
-        .limit(8),
-      db.select().from(providers),
-      db.select().from(users),
-    ]);
+    let allBookings: any[] = [];
+    let allProviders: any[] = [];
+    let allUsers: any[] = [];
+    try {
+      [allBookings, allProviders, allUsers] = await Promise.all([
+        db
+          .select(baseSelect)
+          .from(bookings)
+          .innerJoin(providers, eq(providers.id, bookings.providerId))
+          .innerJoin(services, eq(services.id, bookings.serviceId))
+          .innerJoin(users, eq(users.id, bookings.customerId))
+          .orderBy(desc(bookings.createdAt))
+          .limit(8),
+        db.select().from(providers),
+        db.select().from(users),
+      ]);
+    } catch (err) {
+      console.error("[dashboard:admin] database query failed:", err instanceof Error ? err.message : err);
+    }
 
     const totalBookingsCount = allBookings.length;
     const pending = allBookings.filter((b) => b.status === "pending").length;
@@ -140,17 +147,23 @@ export default async function DashboardOverviewPage({ params }: { params: Promis
       );
     }
 
-    const [allBookings, myServices] = await Promise.all([
-      db
-        .select(baseSelect)
-        .from(bookings)
-        .innerJoin(providers, eq(providers.id, bookings.providerId))
-        .innerJoin(services, eq(services.id, bookings.serviceId))
-        .innerJoin(users, eq(users.id, bookings.customerId))
-        .where(eq(bookings.providerId, provider.id))
-        .orderBy(desc(bookings.createdAt)),
-      db.select().from(services).where(eq(services.providerId, provider.id)),
-    ]);
+    let allBookings: any[] = [];
+    let myServices: any[] = [];
+    try {
+      [allBookings, myServices] = await Promise.all([
+        db
+          .select(baseSelect)
+          .from(bookings)
+          .innerJoin(providers, eq(providers.id, bookings.providerId))
+          .innerJoin(services, eq(services.id, bookings.serviceId))
+          .innerJoin(users, eq(users.id, bookings.customerId))
+          .where(eq(bookings.providerId, provider.id))
+          .orderBy(desc(bookings.createdAt)),
+        db.select().from(services).where(eq(services.providerId, provider.id)),
+      ]);
+    } catch (err) {
+      console.error("[dashboard:provider] database query failed:", err instanceof Error ? err.message : err);
+    }
 
     const pending = allBookings.filter((b) => b.status === "pending");
     const today = new Date().toISOString().slice(0, 10);
@@ -202,14 +215,19 @@ export default async function DashboardOverviewPage({ params }: { params: Promis
   }
 
   // customer
-  const myBookings = await db
-    .select(baseSelect)
-    .from(bookings)
-    .innerJoin(providers, eq(providers.id, bookings.providerId))
-    .innerJoin(services, eq(services.id, bookings.serviceId))
-    .innerJoin(users, eq(users.id, bookings.customerId))
-    .where(eq(bookings.customerId, user.id))
-    .orderBy(desc(bookings.createdAt));
+  let myBookings: any[] = [];
+  try {
+    myBookings = await db
+      .select(baseSelect)
+      .from(bookings)
+      .innerJoin(providers, eq(providers.id, bookings.providerId))
+      .innerJoin(services, eq(services.id, bookings.serviceId))
+      .innerJoin(users, eq(users.id, bookings.customerId))
+      .where(eq(bookings.customerId, user.id))
+      .orderBy(desc(bookings.createdAt));
+  } catch (err) {
+    console.error("[dashboard:customer] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   const upcoming = myBookings.filter((b) => ["pending", "confirmed"].includes(b.status));
   const completed = myBookings.filter((b) => b.status === "completed");

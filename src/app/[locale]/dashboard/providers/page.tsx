@@ -17,7 +17,12 @@ export default async function AdminProvidersPage({ params }: { params: Promise<{
   if (!user) return null;
   if (user.role !== "admin") redirect(localizedPath(locale, "/dashboard"));
 
-  const rows = await db.select().from(providers).orderBy(asc(providers.businessName));
+  let rows: any[] = [];
+  try {
+    rows = await db.select().from(providers).orderBy(asc(providers.businessName));
+  } catch (err) {
+    console.error("[admin:providers] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   return (
     <div>

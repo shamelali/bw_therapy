@@ -35,7 +35,12 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     );
   }
 
-  const rows = await db.select().from(services).where(eq(services.providerId, provider.id));
+  let rows: any[] = [];
+  try {
+    rows = await db.select().from(services).where(eq(services.providerId, provider.id));
+  } catch (err) {
+    console.error("[services] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   return (
     <div>

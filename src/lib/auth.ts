@@ -67,10 +67,15 @@ export async function getSession(): Promise<SessionPayload | null> {
 }
 
 export async function getCurrentUser(): Promise<User | null> {
-  const session = await getSession();
-  if (!session) return null;
-  const [user] = await db.select().from(users).where(eq(users.id, session.userId)).limit(1);
-  return user ?? null;
+  try {
+    const session = await getSession();
+    if (!session) return null;
+    const [user] = await db.select().from(users).where(eq(users.id, session.userId)).limit(1);
+    return user ?? null;
+  } catch (err) {
+    console.error("[auth] getCurrentUser failed:", err instanceof Error ? err.message : err);
+    return null;
+  }
 }
 
 export const SESSION_COOKIE_NAME = SESSION_COOKIE;

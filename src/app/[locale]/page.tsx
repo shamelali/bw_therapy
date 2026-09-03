@@ -35,14 +35,20 @@ export default async function HomePage({
     );
   }
 
-  const [rows, cityRows] = await Promise.all([
-    db
-      .select()
-      .from(providers)
-      .where(and(...conditions))
-      .orderBy(asc(providers.businessName)),
-    db.selectDistinct({ city: providers.city }).from(providers).orderBy(asc(providers.city)),
-  ]);
+  let rows: any[] = [];
+  let cityRows: { city: string }[] = [];
+  try {
+    [rows, cityRows] = await Promise.all([
+      db
+        .select()
+        .from(providers)
+        .where(and(...conditions))
+        .orderBy(asc(providers.businessName)),
+      db.selectDistinct({ city: providers.city }).from(providers).orderBy(asc(providers.city)),
+    ]);
+  } catch (err) {
+    console.error("[home] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   const hasFilters = Boolean(
     searchParamsResolved.q || (searchParamsResolved.city && searchParamsResolved.city !== "all") || (searchParamsResolved.type && searchParamsResolved.type !== "all"),

@@ -20,26 +20,41 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
   const locale: Locale = rawLocale;
   const dict = getDictionary(locale);
 
-  const [provider] = await db.select().from(providers).where(eq(providers.id, id)).limit(1);
+  let provider: any = null;
+  try {
+    const [result] = await db.select().from(providers).where(eq(providers.id, id)).limit(1);
+    provider = result;
+  } catch (err) {
+    console.error("[provider] database query failed:", err instanceof Error ? err.message : err);
+    notFound();
+  }
   if (!provider) notFound();
 
-  const [serviceRows, availabilityRows, reviewRows, currentUser] = await Promise.all([
-    db.select().from(services).where(eq(services.providerId, id)),
-    db.select().from(availability).where(eq(availability.providerId, id)),
-    db
-      .select({
-        id: reviews.id,
-        rating: reviews.rating,
-        comment: reviews.comment,
-        createdAt: reviews.createdAt,
-        customerName: users.name,
-      })
-      .from(reviews)
-      .innerJoin(users, eq(users.id, reviews.customerId))
-      .where(eq(reviews.providerId, id))
-      .orderBy(desc(reviews.createdAt)),
-    getCurrentUser(),
-  ]);
+  let serviceRows: any[] = [];
+  let availabilityRows: any[] = [];
+  let reviewRows: any[] = [];
+  let currentUser: any = null;
+  try {
+    [serviceRows, availabilityRows, reviewRows, currentUser] = await Promise.all([
+      db.select().from(services).where(eq(services.providerId, id)),
+      db.select().from(availability).where(eq(availability.providerId, id)),
+      db
+        .select({
+          id: reviews.id,
+          rating: reviews.rating,
+          comment: reviews.comment,
+          createdAt: reviews.createdAt,
+          customerName: users.name,
+        })
+        .from(reviews)
+        .innerJoin(users, eq(users.id, reviews.customerId))
+        .where(eq(reviews.providerId, id))
+        .orderBy(desc(reviews.createdAt)),
+      getCurrentUser(),
+    ]);
+  } catch (err) {
+    console.error("[provider] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   const activeAvailability = availabilityRows
     .filter((a) => a.isActive)

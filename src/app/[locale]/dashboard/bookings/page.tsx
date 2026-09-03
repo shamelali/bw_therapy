@@ -49,16 +49,20 @@ export default async function BookingsPage({ params }: { params: Promise<{ local
 
   let rows: (typeof selection extends any ? any : never)[] = [];
 
-  if (user.role === "admin") {
-    rows = await baseQuery;
-  } else if (user.role === "customer") {
-    rows = await baseQuery.where(eq(bookings.customerId, user.id));
-  } else {
-    const provider = await getProviderByUserId(user.id);
-    if (!provider) {
-      return <EmptyState title={dict.bookingsPage.needsProfileTitle} description={dict.bookingsPage.needsProfileDesc} />;
+  try {
+    if (user.role === "admin") {
+      rows = await baseQuery;
+    } else if (user.role === "customer") {
+      rows = await baseQuery.where(eq(bookings.customerId, user.id));
+    } else {
+      const provider = await getProviderByUserId(user.id);
+      if (!provider) {
+        return <EmptyState title={dict.bookingsPage.needsProfileTitle} description={dict.bookingsPage.needsProfileDesc} />;
+      }
+      rows = await baseQuery.where(eq(bookings.providerId, provider.id));
     }
-    rows = await baseQuery.where(eq(bookings.providerId, provider.id));
+  } catch (err) {
+    console.error("[bookings] database query failed:", err instanceof Error ? err.message : err);
   }
 
   const bookingRows: BookingRow[] = rows.map((r) => ({ ...r, hasReview: Boolean(r.reviewId) }));

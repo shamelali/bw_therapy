@@ -17,10 +17,15 @@ export default async function AdminUsersPage({ params }: { params: Promise<{ loc
   if (!user) return null;
   if (user.role !== "admin") redirect(localizedPath(locale, "/dashboard"));
 
-  const rows = await db
-    .select({ id: users.id, name: users.name, email: users.email, role: users.role, createdAt: users.createdAt })
-    .from(users)
-    .orderBy(asc(users.name));
+  let rows: any[] = [];
+  try {
+    rows = await db
+      .select({ id: users.id, name: users.name, email: users.email, role: users.role, createdAt: users.createdAt })
+      .from(users)
+      .orderBy(asc(users.name));
+  } catch (err) {
+    console.error("[admin:users] database query failed:", err instanceof Error ? err.message : err);
+  }
 
   return (
     <div>
