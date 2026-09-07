@@ -74,6 +74,8 @@ const en = {
     searchPlaceholder: "Search therapists, spas, massage centers...",
     cityLabel: "City",
     allCities: "All cities",
+    stateLabel: "State",
+    allStates: "All states",
     typeLabel: "Type",
     allTypes: "All types",
     searchButton: "Search",

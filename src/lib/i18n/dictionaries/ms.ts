@@ -76,6 +76,8 @@ const ms: Dictionary = {
     searchPlaceholder: "Cari ahli terapi, spa, pusat urutan...",
     cityLabel: "Bandar",
     allCities: "Semua bandar",
+    stateLabel: "Negeri",
+    allStates: "Semua negeri",
     typeLabel: "Jenis",
     allTypes: "Semua jenis",
     searchButton: "Cari",

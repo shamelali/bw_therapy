@@ -6,13 +6,14 @@ import { Search } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui/primitives";
 import { useDictionary, useLocalizedHref } from "@/lib/i18n/locale-context";
 
-export function SearchFilters({ cities }: { cities: string[] }) {
+export function SearchFilters({ cities, states }: { cities: string[]; states: string[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dict = useDictionary();
   const buildHref = useLocalizedHref();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
   const [city, setCity] = useState(searchParams.get("city") ?? "all");
+  const [state, setState] = useState(searchParams.get("state") ?? "all");
   const [type, setType] = useState(searchParams.get("type") ?? "all");
   const [isPending, startTransition] = useTransition();
 
@@ -21,6 +22,7 @@ export function SearchFilters({ cities }: { cities: string[] }) {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (city !== "all") params.set("city", city);
+    if (state !== "all") params.set("state", state);
     if (type !== "all") params.set("type", type);
     startTransition(() => {
       router.push(`${buildHref("/")}?${params.toString()}`);
@@ -51,6 +53,17 @@ export function SearchFilters({ cities }: { cities: string[] }) {
           {cities.map((c) => (
             <option key={c} value={c}>
               {c}
+            </option>
+          ))}
+        </Select>
+      </div>
+      <div className="sm:w-48">
+        <label className="mb-1.5 block text-xs font-medium text-slate-500">{dict.search.stateLabel}</label>
+        <Select value={state} onChange={(e) => setState(e.target.value)}>
+          <option value="all">{dict.search.allStates}</option>
+          {states.map((s) => (
+            <option key={s} value={s}>
+              {s}
             </option>
           ))}
         </Select>

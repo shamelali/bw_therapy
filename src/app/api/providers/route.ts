@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim();
   const city = searchParams.get("city")?.trim();
+  const state = searchParams.get("state")?.trim();
   const type = searchParams.get("type")?.trim();
   const includeInactive = searchParams.get("all") === "true";
 
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
   const conditions = [] as any[];
   if (!includeInactive) conditions.push(eq(providers.isActive, true));
   if (city && city !== "all") conditions.push(eq(providers.city, city));
+  if (state && state !== "all") conditions.push(eq(providers.state, state));
   if (type && type !== "all") conditions.push(eq(providers.type, type as any));
   if (q) {
     conditions.push(or(ilike(providers.businessName, `%${q}%`), ilike(providers.description, `%${q}%`)));

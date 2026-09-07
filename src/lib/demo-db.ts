@@ -66,6 +66,7 @@ export const providers = {
   tagline: col("providers", "tagline"),
   description: col("providers", "description"),
   city: col("providers", "city"),
+  state: col("providers", "state"),
   address: col("providers", "address"),
   phone: col("providers", "phone"),
   email: col("providers", "email"),

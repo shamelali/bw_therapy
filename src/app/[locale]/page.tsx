@@ -17,7 +17,7 @@ export default async function HomePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string; city?: string; type?: string }>;
+  searchParams: Promise<{ q?: string; city?: string; type?: string; state?: string }>;
 }) {
   const { locale: rawLocale } = await params;
   if (!isLocale(rawLocale)) notFound();
@@ -36,21 +36,23 @@ export default async function HomePage({
 
   let rows: any[] = [];
   let cityRows: { city: string }[] = [];
+  let stateRows: { state: string }[] = [];
   try {
-    [rows, cityRows] = await Promise.all([
+    [rows, cityRows, stateRows] = await Promise.all([
       db
         .select()
         .from(providers)
         .where(and(...conditions))
         .orderBy(asc(providers.businessName)),
       db.selectDistinct({ city: providers.city }).from(providers).orderBy(asc(providers.city)),
+      db.selectDistinct({ state: providers.state }).from(providers).orderBy(asc(providers.state)),
     ]);
   } catch (err) {
     console.error("[home] database query failed:", err instanceof Error ? err.message : err);
   }
 
   const hasFilters = Boolean(
-    searchParamsResolved.q || (searchParamsResolved.city && searchParamsResolved.city !== "all") || (searchParamsResolved.type && searchParamsResolved.type !== "all"),
+    searchParamsResolved.q || (searchParamsResolved.city && searchParamsResolved.city !== "all") || (searchParamsResolved.state && searchParamsResolved.state !== "all") || (searchParamsResolved.type && searchParamsResolved.type !== "all"),
   );
 
   return (
@@ -67,7 +69,7 @@ export default async function HomePage({
             <p className="mt-4 text-lg text-slate-600">{dict.home.subtitle}</p>
           </div>
           <div className="mx-auto mt-8 max-w-3xl">
-            <SearchFilters cities={cityRows.map((c) => c.city)} />
+            <SearchFilters cities={cityRows.map((c) => c.city)} states={stateRows.map((s) => s.state)} />
           </div>
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3" id="how-it-works">
             <div className="flex items-start gap-3 rounded-xl bg-white/70 p-4">
