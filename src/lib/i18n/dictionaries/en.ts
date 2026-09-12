@@ -68,6 +68,8 @@ const en = {
     noProvidersTitle: "No providers found",
     noProvidersDesc: "Try adjusting your search or filters to find more wellness professionals.",
     footer: "Serenity Marketplace. Built for relaxation.",
+    privacyPolicy: "Privacy Policy",
+    termsOfService: "Terms of Service",
   },
   search: {
     searchLabel: "Search",

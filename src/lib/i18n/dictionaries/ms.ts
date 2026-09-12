@@ -70,6 +70,8 @@ const ms: Dictionary = {
     noProvidersTitle: "Tiada penyedia dijumpai",
     noProvidersDesc: "Cuba laraskan carian atau penapis anda untuk menemui lebih ramai profesional kesihatan.",
     footer: "Pasaran Serenity. Dibina untuk relaksasi.",
+    privacyPolicy: "Dasar Privasi",
+    termsOfService: "Syarat dan Perkhidmatan",
   },
   search: {
     searchLabel: "Carian",

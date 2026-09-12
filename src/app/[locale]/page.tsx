@@ -124,9 +124,17 @@ export default async function HomePage({
         )}
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} {dict.home.footer}
-      </footer>
+<footer className="border-t border-slate-200 bg-white py-8 text-center text-sm text-slate-500">
+         <div className="mb-2">
+           <Link href={localizedPath(locale, "/privacy")} className="text-sm font-medium text-teal-600 hover:underline me-4">
+             {dict.home.privacyPolicy}
+           </Link>
+           <Link href={localizedPath(locale, "/terms")} className="text-sm font-medium text-teal-600 hover:underline">
+             {dict.home.termsOfService}
+           </Link>
+         </div>
+         © {new Date().getFullYear()} {dict.home.footer}
+       </footer>
     </div>
   );
 }
