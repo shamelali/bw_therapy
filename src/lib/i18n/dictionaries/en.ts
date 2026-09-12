@@ -111,6 +111,10 @@ const en = {
     genericRegisterError: "Unable to create account",
     welcomeBackToast: "Welcome back!",
     accountCreatedToast: "Account created! Welcome to Serenity.",
+    continueWithGoogle: "Continue with Google",
+    continueWithFacebook: "Continue with Facebook",
+    continueWithInstagram: "Continue with Instagram",
+    orDivider: "or",
   },
   providerDetail: {
     about: "About",

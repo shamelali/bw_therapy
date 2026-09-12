@@ -5,6 +5,7 @@ import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { LocaleProvider } from "@/lib/i18n/locale-context";
 import { HtmlLangSync } from "@/components/html-lang-sync";
+import { Providers } from "@/components/providers/SessionProvider";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -37,9 +38,11 @@ export default async function LocaleLayout({
   const dict = getDictionary(locale);
 
   return (
-    <LocaleProvider locale={locale} dict={dict}>
-      <HtmlLangSync locale={locale} />
-      {children}
-    </LocaleProvider>
+    <Providers>
+      <LocaleProvider locale={locale} dict={dict}>
+        <HtmlLangSync locale={locale} />
+        {children}
+      </LocaleProvider>
+    </Providers>
   );
 }

@@ -113,6 +113,10 @@ const ms: Dictionary = {
     genericRegisterError: "Tidak dapat mencipta akaun",
     welcomeBackToast: "Selamat kembali!",
     accountCreatedToast: "Akaun berjaya dicipta! Selamat datang ke Serenity.",
+    continueWithGoogle: "Teruskan dengan Google",
+    continueWithFacebook: "Teruskan dengan Facebook",
+    continueWithInstagram: "Teruskan dengan Instagram",
+    orDivider: "atau",
   },
   providerDetail: {
     about: "Perihal",

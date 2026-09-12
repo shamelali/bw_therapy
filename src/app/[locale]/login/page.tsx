@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { Sparkles, Mail, Globe, Camera } from "lucide-react";
 import { Button, Input, Label } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 import { useDictionary, useLocalizedHref } from "@/lib/i18n/locale-context";
@@ -50,6 +51,10 @@ export default function LoginPage() {
     setPassword("password123");
   }
 
+  const handleOAuthSignIn = (provider: "google" | "facebook" | "instagram") => {
+    signIn(provider, { callbackUrl: buildHref("/dashboard") });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-teal-50 to-white px-4 py-12">
       <div className="w-full max-w-md">
@@ -63,7 +68,31 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-slate-900">{dict.auth.loginTitle}</h1>
           <p className="mt-1 text-sm text-slate-500">{dict.auth.loginSubtitle}</p>
 
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div className="mt-6 space-y-3">
+            <Button variant="outline" onClick={() => handleOAuthSignIn("google")} className="w-full gap-2" disabled={loading}>
+              <Globe className="h-4 w-4" />
+              {dict.auth.continueWithGoogle ?? "Continue with Google"}
+            </Button>
+            <Button variant="outline" onClick={() => handleOAuthSignIn("facebook")} className="w-full gap-2" disabled={loading}>
+              <Mail className="h-4 w-4" />
+              {dict.auth.continueWithFacebook ?? "Continue with Facebook"}
+            </Button>
+            <Button variant="outline" onClick={() => handleOAuthSignIn("instagram")} className="w-full gap-2" disabled={loading}>
+              <Camera className="h-4 w-4" />
+              {dict.auth.continueWithInstagram ?? "Continue with Instagram"}
+            </Button>
+          </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-2 text-slate-500">{dict.auth.orDivider ?? "or"}</span>
+            </div>
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <Label>{dict.auth.emailLabel}</Label>
               <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
