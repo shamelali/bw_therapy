@@ -1,59 +1,18 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { Sparkles, Mail, Globe, Camera } from "lucide-react";
-import { Button, Input, Label } from "@/components/ui/primitives";
-import { useToast } from "@/components/ui/toast";
+import { Sparkles, UserRound, Briefcase, ShieldCheck, ArrowRight } from "lucide-react";
 import { useDictionary, useLocalizedHref } from "@/lib/i18n/locale-context";
 
+const ROLE_CARDS = [
+  { role: "customer", icon: UserRound, labelKey: "signInAsCustomer", descKey: "customerRoleDesc", accent: "text-teal-600 bg-teal-100" },
+  { role: "provider", icon: Briefcase, labelKey: "signInAsProvider", descKey: "providerRoleDesc", accent: "text-violet-600 bg-violet-100" },
+  { role: "admin", icon: ShieldCheck, labelKey: "signInAsAdmin", descKey: "adminRoleDesc", accent: "text-slate-700 bg-slate-200" },
+] as const;
+
 export default function LoginPage() {
-  const router = useRouter();
-  const { push } = useToast();
   const dict = useDictionary();
   const buildHref = useLocalizedHref();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? dict.auth.genericLoginError);
-      push(dict.auth.welcomeBackToast, "success");
-      router.push(buildHref("/dashboard"));
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function fillDemo(role: "customer" | "provider" | "admin") {
-    const creds = {
-      customer: "john@demo.com",
-      provider: "sarah@demo.com",
-      admin: "admin@demo.com",
-    };
-    setEmail(creds[role]);
-    setPassword("password123");
-  }
-
-  const handleOAuthSignIn = (provider: "google" | "facebook" | "instagram") => {
-    signIn(provider, { callbackUrl: buildHref("/dashboard") });
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-teal-50 to-white px-4 py-12">
@@ -65,61 +24,26 @@ export default function LoginPage() {
           {dict.common.brand}
         </Link>
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-slate-900">{dict.auth.loginTitle}</h1>
-          <p className="mt-1 text-sm text-slate-500">{dict.auth.loginSubtitle}</p>
+          <h1 className="text-2xl font-bold text-slate-900">{dict.auth.loginRoleTitle}</h1>
+          <p className="mt-1 text-sm text-slate-500">{dict.auth.loginRoleSubtitle}</p>
 
           <div className="mt-6 space-y-3">
-            <Button variant="outline" onClick={() => handleOAuthSignIn("google")} className="w-full gap-2" disabled={loading}>
-              <Globe className="h-4 w-4" />
-              {dict.auth.continueWithGoogle ?? "Continue with Google"}
-            </Button>
-            <Button variant="outline" onClick={() => handleOAuthSignIn("facebook")} className="w-full gap-2" disabled={loading}>
-              <Mail className="h-4 w-4" />
-              {dict.auth.continueWithFacebook ?? "Continue with Facebook"}
-            </Button>
-            <Button variant="outline" onClick={() => handleOAuthSignIn("instagram")} className="w-full gap-2" disabled={loading}>
-              <Camera className="h-4 w-4" />
-              {dict.auth.continueWithInstagram ?? "Continue with Instagram"}
-            </Button>
-          </div>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-slate-500">{dict.auth.orDivider ?? "or"}</span>
-            </div>
-          </div>
-
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div>
-              <Label>{dict.auth.emailLabel}</Label>
-              <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-            </div>
-            <div>
-              <Label>{dict.auth.passwordLabel}</Label>
-              <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-            </div>
-            {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
-            <Button type="submit" loading={loading} className="w-full">
-              {dict.auth.signInButton}
-            </Button>
-          </form>
-
-          <div className="mt-6 rounded-xl bg-slate-50 p-4 text-xs text-slate-500">
-            <p className="mb-2 font-semibold text-slate-600">{dict.auth.demoHint}</p>
-            <div className="flex flex-wrap gap-2">
-              <button onClick={() => fillDemo("customer")} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-teal-300">
-                {dict.auth.demoCustomer}
-              </button>
-              <button onClick={() => fillDemo("provider")} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-teal-300">
-                {dict.auth.demoProvider}
-              </button>
-              <button onClick={() => fillDemo("admin")} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-teal-300">
-                {dict.auth.demoAdmin}
-              </button>
-            </div>
+            {ROLE_CARDS.map(({ role, icon: Icon, labelKey, descKey, accent }) => (
+              <Link
+                key={role}
+                href={buildHref(`/login/${role}`)}
+                className="group flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-teal-300 hover:bg-teal-50/50"
+              >
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${accent}`}>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-slate-900">{dict.auth[labelKey]}</span>
+                  <span className="mt-0.5 block text-xs text-slate-500">{dict.auth[descKey]}</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-teal-600" />
+              </Link>
+            ))}
           </div>
 
           <p className="mt-6 text-center text-sm text-slate-500">

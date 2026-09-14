@@ -3,9 +3,9 @@
 import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { Sparkles, User, Briefcase, Mail, Globe, Camera } from "lucide-react";
+import { Sparkles, User, Briefcase } from "lucide-react";
 import { Button, Input, Label, Select } from "@/components/ui/primitives";
+import { SocialLoginButtons } from "@/components/auth/social-buttons";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { useDictionary, useLocalizedHref } from "@/lib/i18n/locale-context";
@@ -50,10 +50,6 @@ function RegisterForm() {
     }
   }
 
-  const handleOAuthSignIn = (provider: "google" | "facebook" | "instagram") => {
-    signIn(provider, { callbackUrl: buildHref("/dashboard") });
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-teal-50 to-white px-4 py-12">
       <div className="w-full max-w-md">
@@ -67,19 +63,8 @@ function RegisterForm() {
           <h1 className="text-2xl font-bold text-slate-900">{dict.auth.registerTitle}</h1>
           <p className="mt-1 text-sm text-slate-500">{dict.auth.registerSubtitle}</p>
 
-          <div className="mt-6 space-y-3">
-            <Button variant="outline" onClick={() => handleOAuthSignIn("google")} className="w-full gap-2" disabled={loading}>
-              <Globe className="h-4 w-4" />
-              {dict.auth.continueWithGoogle ?? "Continue with Google"}
-            </Button>
-            <Button variant="outline" onClick={() => handleOAuthSignIn("facebook")} className="w-full gap-2" disabled={loading}>
-              <Mail className="h-4 w-4" />
-              {dict.auth.continueWithFacebook ?? "Continue with Facebook"}
-            </Button>
-            <Button variant="outline" onClick={() => handleOAuthSignIn("instagram")} className="w-full gap-2" disabled={loading}>
-              <Camera className="h-4 w-4" />
-              {dict.auth.continueWithInstagram ?? "Continue with Instagram"}
-            </Button>
+          <div className="mt-6">
+            <SocialLoginButtons disabled={loading} />
           </div>
 
           <div className="relative my-6">

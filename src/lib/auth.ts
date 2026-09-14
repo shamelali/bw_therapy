@@ -73,6 +73,58 @@ export async function setSessionCookie(payload: SessionPayload) {
   });
 }
 
+export type SocialProvider = "google" | "apple" | "facebook" | "instagram";
+
+/**
+ * One-click social/guest login for the demo build. No account is needed: a
+ * guest identity is created on first sign-in, and every later click signs
+ * straight back in. This satisfies both "enable social login" and "without
+ * needing an account" for the demo, without real OAuth credentials.
+ */
+export async function signInWithSocial({
+  provider,
+  name,
+  email,
+}: {
+  provider: SocialProvider;
+  name?: string | null;
+  email?: string | null;
+}): Promise<{ user: { id: string; role: string; email: string; name: string }; role: string }> {
+  const demoAuth = await getAuthModule();
+  if (demoAuth) {
+    const user = await demoAuth.signInWithSocial({ provider, name, email });
+    await setSessionCookie({ userId: user.id, role: user.role, email: user.email, name: user.name });
+    return { user, role: user.role };
+  }
+
+  // Real DB mode: find or create a customer for this provider identity.
+  const bcrypt = await import("bcryptjs");
+  const { users } = await import("@/db/schema");
+  const fallbackEmail = `guest.${provider}@demo.local`;
+  const guestEmail = (email ?? fallbackEmail).toLowerCase();
+  const role = "customer";
+
+  try {
+    const [existing] = await db.select().from(users).where(eq(users.email, guestEmail)).limit(1);
+    if (existing) {
+      await setSessionCookie({ userId: existing.id, role: existing.role, email: existing.email, name: existing.name });
+      return { user: existing, role: existing.role };
+    }
+  } catch {
+    // fall through to insert
+  }
+
+  const nickname =
+    name || `${provider.charAt(0).toUpperCase()}${provider.slice(1)} Demo Guest`;
+  const pHash = await bcrypt.hash(Math.random().toString(36).slice(2), 10);
+  const [user] = await db
+    .insert(users)
+    .values({ name: nickname, email: guestEmail, passwordHash: pHash, role })
+    .returning();
+  await setSessionCookie({ userId: user.id, role: user.role, email: user.email, name: user.name });
+  return { user, role: user.role };
+}
+
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);

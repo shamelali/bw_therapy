@@ -72,7 +72,7 @@ export function BookingWidget({
     if (!selectedSlot || !serviceId) return;
 
     if (!currentUserRole) {
-      router.push(`${buildHref("/login")}?returnTo=/providers/${providerId}`);
+      router.push(`${buildHref("/login/customer")}?returnTo=/providers/${providerId}`);
       return;
     }
     if (currentUserRole !== "customer") {

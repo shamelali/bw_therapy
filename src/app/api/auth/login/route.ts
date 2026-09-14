@@ -7,6 +7,7 @@ import { setSessionCookie, verifyPassword } from "@/lib/auth";
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  role: z.enum(["customer", "provider", "admin"]).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Enter a valid email and password" }, { status: 400 });
     }
-    const { email, password } = parsed.data;
+    const { email, password, role } = parsed.data;
 
     const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
     if (!user) {
@@ -25,6 +26,13 @@ export async function POST(req: NextRequest) {
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
+
+    if (role && user.role !== role) {
+      return NextResponse.json(
+        { error: "That account belongs to a different role", code: "wrong_role", accountRole: user.role },
+        { status: 401 },
+      );
     }
 
     await setSessionCookie({ userId: user.id, role: user.role, email: user.email, name: user.name });
