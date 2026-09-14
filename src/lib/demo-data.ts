@@ -83,6 +83,12 @@ export interface DemoAvailability {
 const DEMO_PASSWORD_HASH = "$2a$12$LJ3m4ys3HzHdlN3nYv1cEeKo9V7XKb0wOY1XtYJmZ3qFQJ1x9QJ5O";
 
 export const demoUsers: DemoUser[] = [
+  // One-click social guests (no account needed). Pre-seeded so the same guest
+  // identity is present in every module bundle and sign-in is deterministic.
+  { id: "usr-google-guest", name: "Google Demo Guest", email: "guest.google@demo.local", passwordHash: DEMO_PASSWORD_HASH, role: "customer", phone: null, avatarUrl: null, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "usr-apple-guest", name: "Apple Demo Guest", email: "guest.apple@demo.local", passwordHash: DEMO_PASSWORD_HASH, role: "customer", phone: null, avatarUrl: null, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "usr-facebook-guest", name: "Facebook Demo Guest", email: "guest.facebook@demo.local", passwordHash: DEMO_PASSWORD_HASH, role: "customer", phone: null, avatarUrl: null, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "usr-instagram-guest", name: "Instagram Demo Guest", email: "guest.instagram@demo.local", passwordHash: DEMO_PASSWORD_HASH, role: "customer", phone: null, avatarUrl: null, createdAt: "2025-01-01T00:00:00Z" },
   { id: "usr-admin-001", name: "Admin User", email: "admin@demo.com", passwordHash: DEMO_PASSWORD_HASH, role: "admin", phone: "+6012-345-6789", avatarUrl: null, createdAt: "2025-01-01T00:00:00Z" },
   { id: "usr-provider-001", name: "Sarah Chen", email: "sarah@demo.com", passwordHash: DEMO_PASSWORD_HASH, role: "provider", phone: "+6012-345-6789", avatarUrl: null, createdAt: "2025-01-02T00:00:00Z" },
   { id: "usr-provider-002", name: "Ahmad Razak", email: "ahmad@demo.com", passwordHash: DEMO_PASSWORD_HASH, role: "provider", phone: "+6012-345-6790", avatarUrl: null, createdAt: "2025-01-03T00:00:00Z" },

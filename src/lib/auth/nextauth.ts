@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
+import AppleProvider from "next-auth/providers/apple";
 import type { JWT } from "next-auth/jwt";
 import type { Session, DefaultSession } from "next-auth";
 
@@ -23,6 +24,8 @@ declare module "next-auth/jwt" {
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const appleClientId = process.env.APPLE_CLIENT_ID;
+const appleClientSecret = process.env.APPLE_CLIENT_SECRET;
 const facebookClientId = process.env.FACEBOOK_CLIENT_ID;
 const facebookClientSecret = process.env.FACEBOOK_CLIENT_SECRET;
 const instagramClientId = process.env.INSTAGRAM_CLIENT_ID;
@@ -38,6 +41,10 @@ export const authOptions = {
     FacebookProvider({
       clientId: facebookClientId as string,
       clientSecret: facebookClientSecret as string,
+    }),
+    AppleProvider({
+      clientId: appleClientId as string,
+      clientSecret: appleClientSecret as string,
     }),
     {
       id: "instagram",

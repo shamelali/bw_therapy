@@ -99,4 +99,56 @@ export async function createUser(data: {
   return newUser;
 }
 
+export type SocialProvider = "google" | "apple" | "facebook" | "instagram";
+
+const SOCIAL_GUEST_IDS: Record<SocialProvider, string> = {
+  google: "usr-google-guest",
+  apple: "usr-apple-guest",
+  facebook: "usr-facebook-guest",
+  instagram: "usr-instagram-guest",
+};
+
+const SOCIAL_GUEST_EMAILS: Record<SocialProvider, string> = {
+  google: "guest.google@demo.local",
+  apple: "guest.apple@demo.local",
+  facebook: "guest.facebook@demo.local",
+  instagram: "guest.instagram@demo.local",
+};
+
+/**
+ * Demo social login — lets anyone in with one click, no account needed. Since
+ * this is a frontend demo without real OAuth credentials, each provider maps
+ * to a pre-seeded guest customer (see demo-data.ts) so the same button always
+ * signs into the same identity across every server bundle.
+ */
+export async function signInWithSocial({
+  provider,
+  name,
+  email,
+}: {
+  provider: SocialProvider;
+  name?: string | null;
+  email?: string | null;
+}): Promise<DemoUser> {
+  const guestEmail = (email ?? SOCIAL_GUEST_EMAILS[provider]).toLowerCase();
+  const existing = demoUsers.find((u) => u.email === guestEmail);
+  if (existing) return existing;
+
+  const fallback = demoUsers.find((u) => u.id === SOCIAL_GUEST_IDS[provider]);
+  if (fallback) return fallback;
+
+  const guest: DemoUser = {
+    id: SOCIAL_GUEST_IDS[provider],
+    name: name || `${provider.charAt(0).toUpperCase()}${provider.slice(1)} Demo Guest`,
+    email: guestEmail,
+    passwordHash: "$2a$12$demo",
+    role: "customer",
+    phone: null,
+    avatarUrl: null,
+    createdAt: new Date().toISOString(),
+  };
+  demoUsers.push(guest);
+  return guest;
+}
+
 export const SESSION_COOKIE_NAME = SESSION_COOKIE;
